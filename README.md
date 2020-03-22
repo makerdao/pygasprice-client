@@ -31,23 +31,23 @@ NOTE: please see https://ethgasstation.info/blog/changes-to-egs-api/.
 You have to sign up for an API Key and use it when instantiating EthGasStation client. For backward compatibility reasons client can still be created without a key but this can result in API call failures.
 
 instantiate client as  
-`egs = EthGasStation(10, 600)`  
+`egs = EthGasStation(refresh_interval=10, expiry=600)`  
 
 or with an API key (recommended)  
-`egs = EthGasStation(10, 600, MY_API_KEY)`
+`egs = EthGasStation(refresh_interval=10, expiry=600, api_key=MY_API_KEY)`
 
 #### Etherchain.org client
 
 instantiate client as  
-`ethorg = EtherchainOrg(10, 600)`
+`ethorg = EtherchainOrg(refresh_interval=10, expiry=600)`
 
 #### PoaNetwork client
 
 if using public API instantiate client as  
-`poanetwork = POANetwork(10, 600)`  
+`poanetwork = POANetwork(refresh_interval=10, expiry=600)`  
 
 or pass URL if using a local server as  
-`poanetwork = POANetwork(10, 600, "http://127.0.0.1:8000")`
+`poanetwork = POANetwork(refresh_interval=10, expiry=600, alt_url="http://127.0.0.1:8000")`
 
 ## License
 
