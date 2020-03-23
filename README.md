@@ -26,6 +26,8 @@ Add this repository as git submodule to your project and import gas price client
 
 `from pygasprice_client import EthGasStation, POANetwork, EtherchainOrg`
 
+### Supported API clients
+
 #### EthGasStation client
 NOTE: please see https://ethgasstation.info/blog/changes-to-egs-api/.  
 You have to sign up for an API Key and use it when instantiating EthGasStation client. For backward compatibility reasons client can still be created without a key but this can result in API call failures.
@@ -49,18 +51,18 @@ if using public API instantiate client as
 or pass URL if using a local server as  
 `gasprice_api_client = POANetwork(refresh_interval=10, expiry=600, alt_url="http://127.0.0.1:8000")`
 
-#### Retrieve gas prices
+### Retrieve gas prices
 
-##### Safe low price
+#### Safe low price
 `gasprice_api_client.safe_low_price()`  
 
-##### Standard price
+#### Standard price
 `gasprice_api_client.standard_price()`  
 
-##### Fast price
+#### Fast price
 `gasprice_api_client.fast_price()`  
 
-##### Fastest price
+#### Fastest price
 `gasprice_api_client.fastest_price()`
 
 
