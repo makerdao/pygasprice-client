@@ -100,7 +100,7 @@ class GasClientApi:
         raise NotImplementedError
 
     def safe_low_price(self) -> Optional[int]:
-        """Returns the current 'SafeLow (<30m)' gas rice (in Wei).
+        """Returns the current 'SafeLow (<30m)' gas price (in Wei).
 
         Returns:
             The current 'SafeLow (<30m)' gas price (in Wei), or `None` if the client price
