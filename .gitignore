@@ -8,3 +8,5 @@ __pycache__
 
 .DS_Store
 _virtualenv/
+pygasprice_client.egg-info/
+
