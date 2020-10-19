@@ -20,7 +20,7 @@ import time
 
 import pytest
 
-from pygasprice_client import EthGasStation, POANetwork, EtherchainOrg
+from pygasprice_client import EthGasStation, POANetwork, EtherchainOrg, Etherscan
 
 
 @pytest.mark.timeout(45)
@@ -109,4 +109,36 @@ def test_ethgasstation_url():
 
     egs = EthGasStation(10, 600, "abcdefg")
     assert egs.URL == "https://ethgasstation.info/json/ethgasAPI.json?api-key=abcdefg"
+
+
+@pytest.mark.timeout(45)
+def test_etherscan_integration():
+    logging.basicConfig(format='%(asctime)-15s %(levelname)-8s %(message)s', level=logging.DEBUG)
+    logging.getLogger('urllib3.connectionpool').setLevel(logging.INFO)
+    logging.getLogger('requests.packages.urllib3.connectionpool').setLevel(logging.INFO)
+
+    etherscan = Etherscan(10, 600)
+
+    while True:
+        safe_low_price = etherscan.safe_low_price()
+        logging.info(safe_low_price)
+
+        standard_price = etherscan.standard_price()
+        logging.info(standard_price)
+
+        fast_price = etherscan.fast_price()
+        logging.info(fast_price)
+
+        if safe_low_price is not None and standard_price is not None and fast_price is not None:
+            break
+
+        time.sleep(10)
+
+
+def test_etherscan_url():
+    etherscan = Etherscan(10, 600)
+    assert etherscan.URL == "https://api.etherscan.io/api?module=gastracker&action=gasoracle"
+
+    etherscan = Etherscan(10, 600, "abcdefg")
+    assert etherscan.URL == "https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=abcdefg"
 

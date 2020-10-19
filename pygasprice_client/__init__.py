@@ -192,3 +192,23 @@ class EthGasStation(GasClientApi):
         self._fast_price = int(data['fast']*self.SCALE)
         self._fastest_price = int(data['fastest']*self.SCALE)
 
+
+class Etherscan(GasClientApi):
+
+    URL = "https://api.etherscan.io/api?module=gastracker&action=gasoracle"
+    SCALE = 1000000000
+
+    def __init__(self, refresh_interval: int, expiry: int, api_key=None):
+
+        assert(isinstance(api_key, str) or api_key is None)
+
+        if api_key is not None:
+            self.URL = f"{self.URL}&apikey={api_key}"
+
+        super().__init__(self.URL, refresh_interval, expiry)
+
+    def _parse_api_data(self, data):
+        self._safe_low_price = int(data['result']['SafeGasPrice'])*self.SCALE
+        self._standard_price = int(data['result']['ProposeGasPrice'])*self.SCALE
+        self._fast_price = int(data['result']['FastGasPrice'])*self.SCALE
+        self._fastest_price = int(data['result']['FastGasPrice'])*self.SCALE
