@@ -208,7 +208,7 @@ class Etherscan(GasClientApi):
         super().__init__(self.URL, refresh_interval, expiry)
 
     def _parse_api_data(self, data):
-        self._safe_low_price = int(data['result']['SafeGasPrice']*self.SCALE)
-        self._standard_price = int(data['result']['ProposeGasPrice']*self.SCALE)
-        self._fast_price = int(data['result']['FastGasPrice']*self.SCALE)
-        self._fastest_price = int(data['result']['FastGasPrice']*self.SCALE)
+        self._safe_low_price = int(data['result']['SafeGasPrice'])*self.SCALE
+        self._standard_price = int(data['result']['ProposeGasPrice'])*self.SCALE
+        self._fast_price = int(data['result']['FastGasPrice'])*self.SCALE
+        self._fastest_price = int(data['result']['FastGasPrice'])*self.SCALE

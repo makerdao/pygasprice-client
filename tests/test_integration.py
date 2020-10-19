@@ -117,16 +117,16 @@ def test_etherscan_integration():
     logging.getLogger('urllib3.connectionpool').setLevel(logging.INFO)
     logging.getLogger('requests.packages.urllib3.connectionpool').setLevel(logging.INFO)
 
-    egs = EthGasStation(10, 600)
+    etherscan = Etherscan(10, 600)
 
     while True:
-        safe_low_price = egs.safe_low_price()
+        safe_low_price = etherscan.safe_low_price()
         logging.info(safe_low_price)
 
-        standard_price = egs.standard_price()
+        standard_price = etherscan.standard_price()
         logging.info(standard_price)
 
-        fast_price = egs.fast_price()
+        fast_price = etherscan.fast_price()
         logging.info(fast_price)
 
         if safe_low_price is not None and standard_price is not None and fast_price is not None:
@@ -136,9 +136,9 @@ def test_etherscan_integration():
 
 
 def test_etherscan_url():
-    egs = Etherscan(10, 600)
-    assert egs.URL == "https://api.etherscan.io/api?module=gastracker&action=gasoracle"
+    etherscan = Etherscan(10, 600)
+    assert etherscan.URL == "https://api.etherscan.io/api?module=gastracker&action=gasoracle"
 
-    egs = Etherscan(10, 600, "abcdefg")
-    assert egs.URL == "https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=abcdefg"
+    etherscan = Etherscan(10, 600, "abcdefg")
+    assert etherscan.URL == "https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=abcdefg"
 
