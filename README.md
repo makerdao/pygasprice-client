@@ -1,6 +1,6 @@
 # pygasprice-client
 
-Tiny asynchronous client of several gas price APIs (supports ethgasstation, PoaNetwork, Etherchain.org). 
+Tiny asynchronous client of several gas price APIs (supports ethgasstation, PoaNetwork, Etherchain.org, Etherscan). 
 
 It operates using a background thread, which fetches current recommended gas prices from one of APIs supported
 every `refresh_interval` seconds. If due to network issues no current gas prices have been fetched
