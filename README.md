@@ -1,6 +1,6 @@
 # pygasprice-client
 
-Tiny asynchronous client of several gas price APIs (supports ethgasstation, PoaNetwork, Etherchain.org). 
+Tiny asynchronous client of several gas price APIs (supports ethgasstation, PoaNetwork, Etherchain.org, Etherscan). 
 
 It operates using a background thread, which fetches current recommended gas prices from one of APIs supported
 every `refresh_interval` seconds. If due to network issues no current gas prices have been fetched
@@ -50,6 +50,17 @@ if using public API instantiate client as
 
 or pass URL if using a local server as  
 `gasprice_api_client = POANetwork(refresh_interval=10, expiry=600, alt_url="http://127.0.0.1:8000")`
+
+#### Etherscan client
+NOTE: please see https://etherscan.io/apis#gastracker  
+You have to sign up for an API Key and use it when instantiating Etherscan client. Otherwise requests are rate limited (1request/5sec)
+Fastest gas price is not provided (therefore Fast value is returned as Fastest)
+
+instantiate client as  
+`gasprice_api_client = Etherscan(refresh_interval=10, expiry=600)`  
+
+or with an API key (recommended)  
+`gasprice_api_client = Etherscan(refresh_interval=10, expiry=600, api_key=MY_API_KEY)`
 
 ### Retrieve gas prices
 
