@@ -23,6 +23,9 @@ import pytest
 from pygasprice_client import EthGasStation, POANetwork, EtherchainOrg, Etherscan, Gasnow
 
 
+GWEI = 1000000000
+
+
 @pytest.mark.timeout(45)
 def test_poanetwork_integration():
     logging.basicConfig(format='%(asctime)-15s %(levelname)-8s %(message)s', level=logging.DEBUG)
@@ -74,6 +77,7 @@ def test_etherchain_integration():
         logging.info(fast_price)
 
         if safe_low_price is not None and standard_price is not None and fast_price is not None:
+            assert safe_low_price < 5000 * GWEI
             break
 
         time.sleep(1)
@@ -98,6 +102,7 @@ def test_ethgasstation_integration():
         logging.info(fast_price)
 
         if safe_low_price is not None and standard_price is not None and fast_price is not None:
+            assert safe_low_price < 5000 * GWEI
             break
 
         time.sleep(1)
@@ -130,6 +135,7 @@ def test_etherscan_integration():
         logging.info(fast_price)
 
         if safe_low_price is not None and standard_price is not None and fast_price is not None:
+            assert safe_low_price < 5000 * GWEI
             break
 
         time.sleep(10)
@@ -164,6 +170,7 @@ def test_gasnow_integration():
         logging.info(fast_price)
 
         if safe_low_price is not None and standard_price is not None and fast_price is not None and fastest_price is not None:
+            assert safe_low_price < 5000 * GWEI
             break
 
         time.sleep(10)
