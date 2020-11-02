@@ -228,7 +228,7 @@ class Gasnow(GasClientApi):
         super().__init__(self.URL, refresh_interval, expiry)
 
     def _parse_api_data(self, data):
-        self._safe_low_price = int(data['data']['standard'])
-        self._standard_price = int(data['data']['slow'])
+        self._safe_low_price = int(data['data']['slow'])
+        self._standard_price = int(data['data']['standard'])
         self._fast_price = int(data['data']['fast'])
         self._fastest_price = int(data['data']['rapid'])
