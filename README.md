@@ -62,6 +62,18 @@ instantiate client as
 or with an API key (recommended)  
 `gasprice_api_client = Etherscan(refresh_interval=10, expiry=600, api_key=MY_API_KEY)`
 
+#### Gasnow client
+NOTE: https://https://www.gasnow.org/ API Doc: https://https://taichi.network/  
+Uses Spark mempool data for gas estimate.  Data is updated every 8s
+No API key is needed, but `app_name` is an optional setting.
+Requests are rate limited
+
+instantiate client as  
+`gasprice_api_client = Gasnow(refresh_interval=10, expiry=600)`  
+
+or with an App name (recommended)  
+`gasprice_api_client = Gasnow(refresh_interval=10, expiry=600, app_name="MyApp")`
+
 ### Retrieve gas prices
 
 #### Safe low price
