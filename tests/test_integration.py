@@ -23,6 +23,18 @@ import pytest
 from pygasprice_client import EthGasStation, POANetwork, EtherchainOrg, Etherscan, Gasnow
 
 
+GWEI = 1000000000
+
+
+def validate_prices(safe_low_price, standard_price, fast_price, fastest_price):
+    assert fast_price > 1 * GWEI
+    assert safe_low_price < 5000 * GWEI
+    assert safe_low_price <= standard_price
+    assert standard_price <= fast_price
+    if fastest_price:
+        assert fast_price <= fastest_price
+
+
 @pytest.mark.timeout(45)
 def test_poanetwork_integration():
     logging.basicConfig(format='%(asctime)-15s %(levelname)-8s %(message)s', level=logging.DEBUG)
@@ -42,6 +54,7 @@ def test_poanetwork_integration():
         logging.info(fast_price)
 
         if safe_low_price is not None and standard_price is not None and fast_price is not None:
+            validate_prices(safe_low_price, standard_price, fast_price, None)
             break
 
         time.sleep(1)
@@ -74,6 +87,7 @@ def test_etherchain_integration():
         logging.info(fast_price)
 
         if safe_low_price is not None and standard_price is not None and fast_price is not None:
+            validate_prices(safe_low_price, standard_price, fast_price, None)
             break
 
         time.sleep(1)
@@ -98,6 +112,7 @@ def test_ethgasstation_integration():
         logging.info(fast_price)
 
         if safe_low_price is not None and standard_price is not None and fast_price is not None:
+            validate_prices(safe_low_price, standard_price, fast_price, None)
             break
 
         time.sleep(1)
@@ -130,6 +145,7 @@ def test_etherscan_integration():
         logging.info(fast_price)
 
         if safe_low_price is not None and standard_price is not None and fast_price is not None:
+            validate_prices(safe_low_price, standard_price, fast_price, None)
             break
 
         time.sleep(10)
@@ -164,6 +180,7 @@ def test_gasnow_integration():
         logging.info(fast_price)
 
         if safe_low_price is not None and standard_price is not None and fast_price is not None and fastest_price is not None:
+            validate_prices(safe_low_price, standard_price, fast_price, fastest_price)
             break
 
         time.sleep(10)
