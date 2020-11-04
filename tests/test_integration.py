@@ -158,6 +158,7 @@ def test_etherscan_url():
     etherscan = Etherscan(10, 600, "abcdefg")
     assert etherscan.URL == "https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=abcdefg"
 
+
 @pytest.mark.timeout(45)
 def test_gasnow_integration():
     logging.basicConfig(format='%(asctime)-15s %(levelname)-8s %(message)s', level=logging.DEBUG)
