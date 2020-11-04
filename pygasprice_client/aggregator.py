@@ -22,26 +22,26 @@ from pygasprice_client import GasClientApi, EthGasStation, POANetwork, Etherchai
 
 class Aggregator(GasClientApi):
 
-    def __init__(self, refresh: int, expiry: int, ethgasstation_api_key=None):
+    def __init__(self, refresh_interval: int, expiry: int, ethgasstation_api_key=None, poa_network_alt_url=None,
+                 etherscan_api_key=None, gasnow_app_name="pygasprice-client"):
         self.clients = [
-            EthGasStation(refresh_interval=refresh, expiry=refresh, api_key=ethgasstation_api_key),
-            EtherchainOrg(refresh_interval=refresh, expiry=refresh),
-            POANetwork(refresh_interval=refresh, expiry=refresh),
-            Etherscan(refresh_interval=refresh, expiry=refresh),
-            Gasnow(refresh_interval=refresh, expiry=refresh)
+            EthGasStation(refresh_interval=refresh_interval, expiry=expiry, api_key=ethgasstation_api_key),
+            EtherchainOrg(refresh_interval=refresh_interval, expiry=expiry),
+            POANetwork(refresh_interval=refresh_interval, expiry=expiry, alt_url=poa_network_alt_url),
+            Etherscan(refresh_interval=refresh_interval, expiry=expiry, api_key=etherscan_api_key),
+            Gasnow(refresh_interval=refresh_interval, expiry=expiry, app_name=gasnow_app_name)
         ]
         self._safe_low_price = None
         self._standard_price = None
         self._fast_price = None
         self._fastest_price = None
 
-        super().__init__("aggregator", refresh, expiry)
+        super().__init__("aggregator", refresh_interval, expiry)
 
     def _background_run(self):
         # Wait a few seconds for data to become available
-        for wait in range(min(5, self.clients[0].refresh_interval)):
+        for wait in range(min(5, self.refresh_interval)):
             time.sleep(0.5)  # Since there's no synchronous API, wait a few seconds for data to become available
-            print("waiting for data to become available")
             any(map(lambda c: c._last_refresh > 1, self.clients))
 
         while True:
