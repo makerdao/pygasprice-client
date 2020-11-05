@@ -76,7 +76,7 @@ class GasClientApi:
             self.logger.debug(f"Fetched current gas prices from {self.URL}: {data}")
 
             if self._expired:
-                self.logger.info(f"Current gas prices information from {self.URL} became available")
+                self.logger.info(f"Current gas prices from {self.URL} became available")
                 self._expired = False
         except:
             self.logger.warning(f"Failed to fetch current gas prices from {self.URL}")
@@ -87,11 +87,11 @@ class GasClientApi:
 
         else:
             if self._last_refresh == 0:
-                self.logger.warning(f"Current gas prices information from {self.URL} is unavailable")
+                self.logger.warning(f"Current gas prices from {self.URL} are unavailable")
                 self._last_refresh = 1
 
             if not self._expired:
-                self.logger.warning(f"Current gas prices information from {self.URL} has expired")
+                self.logger.warning(f"Current gas prices from {self.URL} have expired")
                 self._expired = True
 
             return None

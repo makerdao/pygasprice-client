@@ -9,6 +9,7 @@ the feed becomes available again.
 
 <https://chat.makerdao.com/channel/keeper>
 
+
 ## Installation
 
 This project uses *Python 3.6.6*.
@@ -19,6 +20,7 @@ git clone https://github.com/makerdao/pygasprice-client.git
 cd pygasprice-client
 pip3 install -r requirements.txt
 ```
+
 
 ## Usage
 
@@ -63,16 +65,23 @@ or with an API key (recommended)
 `gasprice_api_client = Etherscan(refresh_interval=10, expiry=600, api_key=MY_API_KEY)`
 
 #### Gasnow client
-NOTE: https://https://www.gasnow.org/ API Doc: https://https://taichi.network/  
+NOTE: https://www.gasnow.org/ API Doc: https://taichi.network/  
 Uses Spark mempool data for gas estimate.  Data is updated every 8s
-No API key is needed, but `app_name` is an optional setting.
-Requests are rate limited
+No API key is needed, but `app_name` is an optional setting.  Requests are rate limited.
 
 instantiate client as  
 `gasprice_api_client = Gasnow(refresh_interval=10, expiry=600)`  
 
 or with an App name (recommended)  
 `gasprice_api_client = Gasnow(refresh_interval=10, expiry=600, app_name="MyApp")`
+
+### Aggregation
+An _Aggregator_ client is available which combines multiple gas price sources to produce a single price.
+
+instantiate client as  
+`gasprice_agg_client = Aggregator(refresh_interval=10, expiry=600)`
+
+Arguments of component clients are also offered.  Recommend supplying API keys to avoid rate limiting.
 
 ### Retrieve gas prices
 
