@@ -68,6 +68,8 @@ class Aggregator(GasClientApi):
     def aggregate_price(prices: list):
         assert isinstance(prices, list)
 
+        if len(prices) > 3:
+            prices.remove(max(prices))
         if len(prices) > 2:
             prices.remove(min(prices))
 

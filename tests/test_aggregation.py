@@ -40,10 +40,20 @@ def test_aggregator():
 def test_aggregation_methodology():
     GWEI = 1000000000
 
-    # A normal use case
+    # A normal use case with an outlier
+    prices = [24.00 * GWEI, 15.00 * GWEI, 24.00 * GWEI, 127.00 * GWEI, 13.00 * GWEI]
+    price = Aggregator.aggregate_price(prices)
+    assert price == 21.0 * GWEI
+
+    # One price missing
     prices = [64.0 * GWEI, 64.0 * GWEI, 72.0 * GWEI, 65.0 * GWEI]
     price = Aggregator.aggregate_price(prices)
-    assert price == 67 * GWEI
+    assert price == 64.5 * GWEI
+
+    # Only three prices
+    prices = [16.80 * GWEI, 18.00 * GWEI, 15.65 * GWEI]
+    price = Aggregator.aggregate_price(prices)
+    assert price == 17.4 * GWEI
 
     # Only two prices
     prices = [23.0 * GWEI, 24.0 * GWEI]
