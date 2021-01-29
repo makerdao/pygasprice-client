@@ -18,7 +18,9 @@
 import logging
 import threading
 import time
+from requests.exceptions import RequestException
 from typing import Optional
+from urllib3.exceptions import HTTPError
 
 import requests
 
@@ -44,7 +46,7 @@ class GasClientApi:
 
     logger = logging.getLogger()
 
-    def __init__(self, url: str, refresh_interval: int, expiry: int):
+    def __init__(self, url: str, refresh_interval: int, expiry: int, headers=None):
         assert(isinstance(url, str))
         assert(isinstance(refresh_interval, int))
         assert(isinstance(expiry, int))
@@ -53,6 +55,7 @@ class GasClientApi:
 
         self.refresh_interval = refresh_interval
         self.expiry = expiry
+        self.headers = headers
         self._safe_low_price = None
         self._standard_price = None
         self._fast_price = None
@@ -68,7 +71,7 @@ class GasClientApi:
 
     def _fetch_price(self):
         try:
-            data = requests.get(self.URL).json()
+            data = requests.get(self.URL, headers=self.headers).json()
 
             self._parse_api_data(data)
             self._last_refresh = int(time.time())
@@ -78,7 +81,7 @@ class GasClientApi:
             if self._expired:
                 self.logger.info(f"Current gas prices from {self.URL} became available")
                 self._expired = False
-        except:
+        except (ConnectionError, HTTPError, RequestException) as ex:
             self.logger.warning(f"Failed to fetch current gas prices from {self.URL}")
 
     def _return_value_if_valid(self, value: int) -> Optional[int]:
@@ -232,3 +235,21 @@ class Gasnow(GasClientApi):
         self._standard_price = int(data['data']['standard'])
         self._fast_price = int(data['data']['fast'])
         self._fastest_price = int(data['data']['rapid'])
+
+
+class Blocknative(GasClientApi):
+
+    URL = "https://api.blocknative.com/gasprices/blockprices"
+    SCALE = 1000000000
+
+    def __init__(self, refresh_interval: int, expiry: int, api_key):
+        assert isinstance(api_key, str)
+        headers = {"Authorization": api_key}
+        super().__init__(self.URL, refresh_interval, expiry, headers)
+
+    def _parse_api_data(self, data):
+        next_block_prices = data['blockPrices'][0]['estimatedPrices']
+        self._safe_low_price = int(next_block_prices[3]['price'])*self.SCALE
+        self._standard_price = int(next_block_prices[2]['price'])*self.SCALE
+        self._fast_price = int(next_block_prices[1]['price'])*self.SCALE
+        self._fastest_price = int(next_block_prices[0]['price'])*self.SCALE
