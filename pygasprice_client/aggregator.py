@@ -1,6 +1,6 @@
 # This file is part of Maker Keeper Framework.
 #
-# Copyright (C) 2020 EdNoepel
+# Copyright (C) 2020-2021 EdNoepel
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -17,13 +17,13 @@
 
 import time
 
-from pygasprice_client import GasClientApi, EthGasStation, POANetwork, EtherchainOrg, Etherscan, Gasnow
+from pygasprice_client import GasClientApi, EthGasStation, POANetwork, EtherchainOrg, Etherscan, Gasnow, Blocknative
 
 
 class Aggregator(GasClientApi):
 
     def __init__(self, refresh_interval: int, expiry: int, ethgasstation_api_key=None, poa_network_alt_url=None,
-                 etherscan_api_key=None, gasnow_app_name="pygasprice-client"):
+                 etherscan_api_key=None, gasnow_app_name="pygasprice-client", blocknative_api_key=None):
         self.clients = [
             EthGasStation(refresh_interval=refresh_interval, expiry=expiry, api_key=ethgasstation_api_key),
             EtherchainOrg(refresh_interval=refresh_interval, expiry=expiry),
@@ -31,6 +31,9 @@ class Aggregator(GasClientApi):
             Etherscan(refresh_interval=refresh_interval, expiry=expiry, api_key=etherscan_api_key),
             Gasnow(refresh_interval=refresh_interval, expiry=expiry, app_name=gasnow_app_name)
         ]
+        if blocknative_api_key:
+            self.clients.append(Blocknative(refresh_interval=refresh_interval, expiry=expiry, api_key=blocknative_api_key))
+
         self._safe_low_price = None
         self._standard_price = None
         self._fast_price = None

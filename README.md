@@ -1,11 +1,14 @@
 # pygasprice-client
 
-Tiny asynchronous client of several gas price APIs (supports ethgasstation, PoaNetwork, Etherchain.org, Etherscan). 
+Tiny asynchronous client of several gas price APIs. 
 
 It operates using a background thread, which fetches current recommended gas prices from one of APIs supported
 every `refresh_interval` seconds. If due to network issues no current gas prices have been fetched
 for `expiry` seconds, old values expire and all `*_price()` methods will start returning `None` until
 the feed becomes available again.
+
+Since _GasNow_ and _Blocknative_ are based upon current mempool activity and not modeled using recent blocks, 
+it is recommended to query them with smaller intervals (for example, 15 seconds instead of 60).
 
 <https://chat.makerdao.com/channel/keeper>
 
@@ -35,23 +38,23 @@ NOTE: please see https://ethgasstation.info/blog/changes-to-egs-api/.
 You have to sign up for an API Key and use it when instantiating EthGasStation client. For backward compatibility reasons client can still be created without a key but this can result in API call failures.
 
 instantiate client as  
-`gasprice_api_client = EthGasStation(refresh_interval=10, expiry=600)`  
+`gasprice_api_client = EthGasStation(refresh_interval=45, expiry=600)`  
 
 or with an API key (recommended)  
-`gasprice_api_client = EthGasStation(refresh_interval=10, expiry=600, api_key=MY_API_KEY)`
+`gasprice_api_client = EthGasStation(refresh_interval=45, expiry=600, api_key=MY_API_KEY)`
 
 #### Etherchain.org client
 
 instantiate client as  
-`gasprice_api_client = EtherchainOrg(refresh_interval=10, expiry=600)`
+`gasprice_api_client = EtherchainOrg(refresh_interval=45, expiry=600)`
 
 #### PoaNetwork client
 
 if using public API instantiate client as  
-`gasprice_api_client = POANetwork(refresh_interval=10, expiry=600)`  
+`gasprice_api_client = POANetwork(refresh_interval=45, expiry=600)`  
 
 or pass URL if using a local server as  
-`gasprice_api_client = POANetwork(refresh_interval=10, expiry=600, alt_url="http://127.0.0.1:8000")`
+`gasprice_api_client = POANetwork(refresh_interval=45, expiry=600, alt_url="http://127.0.0.1:8000")`
 
 #### Etherscan client
 NOTE: please see https://etherscan.io/apis#gastracker  
@@ -59,10 +62,10 @@ You have to sign up for an API Key and use it when instantiating Etherscan clien
 Fastest gas price is not provided (therefore Fast value is returned as Fastest)
 
 instantiate client as  
-`gasprice_api_client = Etherscan(refresh_interval=10, expiry=600)`  
+`gasprice_api_client = Etherscan(refresh_interval=45, expiry=600)`  
 
 or with an API key (recommended)  
-`gasprice_api_client = Etherscan(refresh_interval=10, expiry=600, api_key=MY_API_KEY)`
+`gasprice_api_client = Etherscan(refresh_interval=45, expiry=600, api_key=MY_API_KEY)`
 
 #### Gasnow client
 NOTE: https://www.gasnow.org/ API Doc: https://taichi.network/  
@@ -70,10 +73,16 @@ Uses Spark mempool data for gas estimate.  Data is updated every 8s
 No API key is needed, but `app_name` is an optional setting.  Requests are rate limited.
 
 instantiate client as  
-`gasprice_api_client = Gasnow(refresh_interval=10, expiry=600)`  
+`gasprice_api_client = Gasnow(refresh_interval=10, expiry=60)`  
 
 or with an App name (recommended)  
-`gasprice_api_client = Gasnow(refresh_interval=10, expiry=600, app_name="MyApp")`
+`gasprice_api_client = Gasnow(refresh_interval=10, expiry=60, app_name="MyApp")`
+
+#### Blocknative client
+See https://docs.blocknative.com/gas-platform for details.  An API key is required.
+
+instantiate client as 
+`gasprice_api_client = Blocknative(refresh_interval=10, expiry=60, api_key=MY_API_KEY)`
 
 ### Aggregation
 An _Aggregator_ client is available which combines multiple gas price sources to produce a single price.
@@ -81,7 +90,8 @@ An _Aggregator_ client is available which combines multiple gas price sources to
 instantiate client as  
 `gasprice_agg_client = Aggregator(refresh_interval=10, expiry=600)`
 
-Arguments of component clients are also offered.  Recommend supplying API keys to avoid rate limiting.
+Arguments of component clients are also offered.  Supply API keys to avoid rate limiting and exclusion of sources which 
+require a key.
 
 ### Retrieve gas prices
 
