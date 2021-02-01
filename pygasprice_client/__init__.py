@@ -18,9 +18,7 @@
 import logging
 import threading
 import time
-from requests.exceptions import RequestException
 from typing import Optional
-from urllib3.exceptions import HTTPError
 
 import requests
 
@@ -81,7 +79,7 @@ class GasClientApi:
             if self._expired:
                 self.logger.info(f"Current gas prices from {self.URL} became available")
                 self._expired = False
-        except (ConnectionError, HTTPError, RequestException) as ex:
+        except:
             self.logger.warning(f"Failed to fetch current gas prices from {self.URL}")
 
     def _return_value_if_valid(self, value: int) -> Optional[int]:
