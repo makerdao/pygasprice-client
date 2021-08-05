@@ -18,7 +18,10 @@
 import pytest
 import time
 
+from pygasprice_client import GasClientApi
 from pygasprice_client.aggregator import Aggregator
+
+GWEI = 1000000000
 
 
 @pytest.mark.timeout(15)
@@ -38,8 +41,6 @@ def test_aggregator():
 
 
 def test_aggregation_methodology():
-    GWEI = 1000000000
-
     # A normal use case with an outlier
     prices = [24.00 * GWEI, 15.00 * GWEI, 24.00 * GWEI, 127.00 * GWEI, 13.00 * GWEI]
     price = Aggregator.aggregate(prices)
@@ -69,3 +70,72 @@ def test_aggregation_methodology():
     prices = []
     price = Aggregator.aggregate(prices)
     assert not price
+
+
+def test_london_aggregation():
+    class MockGasClient(GasClientApi):
+        SCALE = 1000000000
+
+        def __init__(self, multiplier: float):
+            assert isinstance(multiplier, float)
+            self.multiplier = multiplier
+
+            self.URL = "(none)"
+            self.refresh_interval = 0
+            self.expiry = 600
+            self.headers = None
+
+            # indexed 0 (safe low) to 3 (fastest)
+            self._gas_prices = []
+            self._max_fees = []
+            self._max_tips = []
+
+            self._last_refresh = 0
+            self._expired = True
+
+        def _fetch_price(self):
+            print("MockGasClient._fetch_price called")
+            self._parse_api_data(None)
+            self._last_refresh = int(time.time())
+            self._expired = False
+
+        def _parse_api_data(self, data):
+            print("MockGasClient._parse_api_data called")
+            self._gas_prices = [int(55 * self.SCALE * self.multiplier),
+                                int(56 * self.SCALE * self.multiplier),
+                                int(57 * self.SCALE * self.multiplier),
+                                int(58 * self.SCALE * self.multiplier)]
+            self._max_fees = [int(100) * self.SCALE * self.multiplier,
+                              int(110) * self.SCALE * self.multiplier,
+                              int(120) * self.SCALE * self.multiplier,
+                              int(130) * self.SCALE * self.multiplier]
+            self._max_tips = [int(1) * self.SCALE * self.multiplier,
+                              int(2) * self.SCALE * self.multiplier,
+                              int(3) * self.SCALE * self.multiplier,
+                              int(4) * self.SCALE * self.multiplier]
+
+    class AggregatorTestHarness(Aggregator):
+        def __init__(self):
+            super().__init__(1, 600)
+
+        def _background_run(self):
+            print("called AggregatorTestHarness._background_run")
+            self.clients = [MockGasClient(1.0), MockGasClient(2.0)]
+            self.clients[0]._fetch_price()
+            self.clients[1]._fetch_price()
+            super()._background_run()
+
+    aggregator = AggregatorTestHarness()
+    time.sleep(0.5)
+    assert len(aggregator.clients) == 2
+    aggregator._fetch_price()
+
+    assert aggregator.clients[0].fastest_price()
+    assert aggregator.clients[1].fastest_price()
+    assert aggregator.fastest_price()
+    assert aggregator.fastest_maxfee()
+    assert aggregator.fastest_tip()
+
+    assert aggregator.safe_low_price() == (55 + 55*2)/2 * GWEI
+    assert aggregator.standard_maxfee() == (110 + 110*2)/2 * GWEI
+    assert aggregator.fast_tip() == (3 + 3*2)/2 * GWEI

@@ -283,8 +283,6 @@ class Blocknative(GasClientApi):
         super().__init__(self.URL, refresh_interval, expiry, headers)
 
     def _parse_api_data(self, data):
-        from pprint import pprint
-        # pprint(data)
         next_block_prices = data['blockPrices'][0]['estimatedPrices']
         self._gas_prices = [int(next_block_prices[3]['price']) * self.SCALE,
                             int(next_block_prices[2]['price']) * self.SCALE,
