@@ -54,10 +54,11 @@ class GasClientApi:
         self.refresh_interval = refresh_interval
         self.expiry = expiry
         self.headers = headers
-        self._safe_low_price = None
-        self._standard_price = None
-        self._fast_price = None
-        self._fastest_price = None
+
+        self._gas_prices = []
+        self._max_fees = []
+        self._max_tips = []
+
         self._last_refresh = 0
         self._expired = True
         threading.Thread(target=self._background_run, daemon=True).start()
@@ -107,7 +108,7 @@ class GasClientApi:
             The current 'SafeLow (<30m)' gas price (in Wei), or `None` if the client price
             feed has expired.
         """
-        return self._return_value_if_valid(self._safe_low_price)
+        return self._return_value_if_valid(self._gas_prices[0])
 
     def standard_price(self) -> Optional[int]:
         """Returns the current 'Standard (<5m)' gas price (in Wei).
@@ -116,7 +117,7 @@ class GasClientApi:
             The current 'Standard (<5m)' gas price (in Wei), or `None` if the client price
             feed has expired.
         """
-        return self._return_value_if_valid(self._standard_price)
+        return self._return_value_if_valid(self._gas_prices[1])
 
     def fast_price(self) -> Optional[int]:
         """Returns the current 'Fast (<2m)' gas price (in Wei).
@@ -125,7 +126,7 @@ class GasClientApi:
             The current 'Fast (<2m)' gas price (in Wei), or `None` if the client price
             feed has expired.
         """
-        return self._return_value_if_valid(self._fast_price)
+        return self._return_value_if_valid(self._gas_prices[2])
 
     def fastest_price(self) -> Optional[int]:
         """Returns the current fastest (undocumented!) gas price (in Wei).
@@ -134,7 +135,7 @@ class GasClientApi:
             The current fastest (undocumented!) gas price (in Wei), or `None` if the client price
             feed has expired.
         """
-        return self._return_value_if_valid(self._fastest_price)
+        return self._return_value_if_valid(self._gas_prices[3])
 
 
 class EtherchainOrg(GasClientApi):
@@ -146,10 +147,10 @@ class EtherchainOrg(GasClientApi):
         super().__init__(self.URL, refresh_interval, expiry)
 
     def _parse_api_data(self, data):
-        self._safe_low_price = int(float(data['safeLow'])*self.SCALE)
-        self._standard_price = int(float(data['standard'])*self.SCALE)
-        self._fast_price = int(float(data['fast'])*self.SCALE)
-        self._fastest_price = int(float(data['fastest'])*self.SCALE)
+        self._gas_prices = [int(float(data['safeLow'])*self.SCALE),
+                            int(float(data['standard'])*self.SCALE),
+                            int(float(data['fast'])*self.SCALE),
+                            int(float(data['fastest'])*self.SCALE)]
 
 
 class POANetwork(GasClientApi):
@@ -167,10 +168,10 @@ class POANetwork(GasClientApi):
         super().__init__(self.URL, refresh_interval, expiry)
 
     def _parse_api_data(self, data):
-        self._safe_low_price = int(data['slow']*self.SCALE)
-        self._standard_price = int(data['standard']*self.SCALE)
-        self._fast_price = int(data['fast']*self.SCALE)
-        self._fastest_price = int(data['instant']*self.SCALE)
+        self._gas_prices = [int(data['slow']*self.SCALE),
+                            int(data['standard']*self.SCALE),
+                            int(data['fast']*self.SCALE),
+                            int(data['instant']*self.SCALE)]
 
 
 class EthGasStation(GasClientApi):
@@ -188,10 +189,10 @@ class EthGasStation(GasClientApi):
         super().__init__(self.URL, refresh_interval, expiry)
 
     def _parse_api_data(self, data):
-        self._safe_low_price = int(data['safeLow']*self.SCALE)
-        self._standard_price = int(data['average']*self.SCALE)
-        self._fast_price = int(data['fast']*self.SCALE)
-        self._fastest_price = int(data['fastest']*self.SCALE)
+        self._gas_prices = [int(data['safeLow']*self.SCALE),
+                            int(data['average']*self.SCALE),
+                            int(data['fast']*self.SCALE),
+                            int(data['fastest']*self.SCALE)]
 
 
 class Etherscan(GasClientApi):
@@ -209,10 +210,10 @@ class Etherscan(GasClientApi):
         super().__init__(self.URL, refresh_interval, expiry)
 
     def _parse_api_data(self, data):
-        self._safe_low_price = int(data['result']['SafeGasPrice'])*self.SCALE
-        self._standard_price = int(data['result']['ProposeGasPrice'])*self.SCALE
-        self._fast_price = int(data['result']['FastGasPrice'])*self.SCALE
-        self._fastest_price = int(data['result']['FastGasPrice'])*self.SCALE
+        self._gas_prices = [int(data['result']['SafeGasPrice'])*self.SCALE,
+                            int(data['result']['ProposeGasPrice'])*self.SCALE,
+                            int(data['result']['FastGasPrice'])*self.SCALE,
+                            int(data['result']['FastGasPrice'])*self.SCALE]
 
 
 class Gasnow(GasClientApi):
@@ -229,10 +230,10 @@ class Gasnow(GasClientApi):
         super().__init__(self.URL, refresh_interval, expiry)
 
     def _parse_api_data(self, data):
-        self._safe_low_price = int(data['data']['slow'])
-        self._standard_price = int(data['data']['standard'])
-        self._fast_price = int(data['data']['fast'])
-        self._fastest_price = int(data['data']['rapid'])
+        self._gas_prices = [int(data['data']['slow']),
+                            int(data['data']['standard']),
+                            int(data['data']['fast']),
+                            int(data['data']['rapid'])]
 
 
 class Blocknative(GasClientApi):
@@ -247,7 +248,7 @@ class Blocknative(GasClientApi):
 
     def _parse_api_data(self, data):
         next_block_prices = data['blockPrices'][0]['estimatedPrices']
-        self._safe_low_price = int(next_block_prices[3]['price'])*self.SCALE
-        self._standard_price = int(next_block_prices[2]['price'])*self.SCALE
-        self._fast_price = int(next_block_prices[1]['price'])*self.SCALE
-        self._fastest_price = int(next_block_prices[0]['price'])*self.SCALE
+        self._gas_prices = [int(next_block_prices[3]['price'])*self.SCALE,
+                            int(next_block_prices[2]['price'])*self.SCALE,
+                            int(next_block_prices[1]['price'])*self.SCALE,
+                            int(next_block_prices[0]['price'])*self.SCALE]
