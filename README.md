@@ -1,4 +1,5 @@
 # pygasprice-client
+[![Build Status](https://travis-ci.com/makerdao/pygasprice-client.svg?branch=master)](https://travis-ci.com/makerdao/pygasprice-client)
 
 Tiny asynchronous client of several gas price APIs. 
 
@@ -93,19 +94,30 @@ instantiate client as
 Arguments of component clients are also offered.  Supply API keys to avoid rate limiting and exclusion of sources which 
 require a key.
 
-### Retrieve gas prices
+### Retrieve suggested gas prices
+Gas prices are useful for legacy (pre- EIP-1559) transactions.
 
-#### Safe low price
 `gasprice_api_client.safe_low_price()`  
-
-#### Standard price
 `gasprice_api_client.standard_price()`  
-
-#### Fast price
 `gasprice_api_client.fast_price()`  
-
-#### Fastest price
 `gasprice_api_client.fastest_price()`
+
+
+### Retrieve suggested max fees and tip amounts
+Max fees limit the total price spent per gas.  This consists of a floating base fee calculated for each block, 
+plus an explicit tip paid to miners to prioritize the transaction.  The max fee should generally exceed the base fee 
+plus the tip.  The difference between the tip and the base fee is burned.  A tip of 0 should always be valid for 
+a "safe/low" transaction.
+
+`gasprice_api_client.safe_low_maxfee()`  
+`gasprice_api_client.standard_maxfee()`  
+`gasprice_api_client.fast_maxfee()`  
+`gasprice_api_client.fastest_maxfee()`
+
+`gasprice_api_client.safe_low_tip()`  
+`gasprice_api_client.standard_tip()`  
+`gasprice_api_client.fast_tip()`  
+`gasprice_api_client.fastest_tip()`
 
 
 ## License
