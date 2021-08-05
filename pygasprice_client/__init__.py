@@ -55,6 +55,7 @@ class GasClientApi:
         self.expiry = expiry
         self.headers = headers
 
+        # indexed 0 (safe low) to 3 (fastest)
         self._gas_prices = []
         self._max_fees = []
         self._max_tips = []
