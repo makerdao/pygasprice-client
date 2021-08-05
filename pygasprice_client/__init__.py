@@ -22,6 +22,11 @@ from typing import Optional
 
 import requests
 
+SAFELOW = 0
+STANDARD = 1
+FAST = 2
+FASTEST = 3
+
 
 class GasClientApi:
     """Asynchronous client for several gas price APIs.
@@ -112,7 +117,7 @@ class GasClientApi:
             The current 'SafeLow (<30m)' gas price (in Wei), or `None` if the client price
             feed has expired.
         """
-        return self._return_value_if_valid(self._gas_prices, 0)
+        return self._return_value_if_valid(self._gas_prices, SAFELOW)
 
     def standard_price(self) -> Optional[int]:
         """Returns the current 'Standard (<5m)' gas price (in Wei).
@@ -121,7 +126,7 @@ class GasClientApi:
             The current 'Standard (<5m)' gas price (in Wei), or `None` if the client price
             feed has expired.
         """
-        return self._return_value_if_valid(self._gas_prices, 1)
+        return self._return_value_if_valid(self._gas_prices, STANDARD)
 
     def fast_price(self) -> Optional[int]:
         """Returns the current 'Fast (<2m)' gas price (in Wei).
@@ -130,7 +135,7 @@ class GasClientApi:
             The current 'Fast (<2m)' gas price (in Wei), or `None` if the client price
             feed has expired.
         """
-        return self._return_value_if_valid(self._gas_prices, 2)
+        return self._return_value_if_valid(self._gas_prices, FAST)
 
     def fastest_price(self) -> Optional[int]:
         """Returns the current fastest (undocumented!) gas price (in Wei).
@@ -139,7 +144,34 @@ class GasClientApi:
             The current fastest (undocumented!) gas price (in Wei), or `None` if the client price
             feed has expired.
         """
-        return self._return_value_if_valid(self._gas_prices, 3)
+        return self._return_value_if_valid(self._gas_prices, FASTEST)
+
+
+    """Recommends a maxFeePerGas value, to limit base fee plus priority fee (tip)"""
+    def safe_low_maxfee(self) -> Optional[int]:
+        return self._return_value_if_valid(self._max_fees, SAFELOW)
+
+    def standard_maxfee(self) -> Optional[int]:
+        return self._return_value_if_valid(self._max_fees, STANDARD)
+
+    def fast_maxfee(self) -> Optional[int]:
+        return self._return_value_if_valid(self._max_fees, FAST)
+
+    def fastest_maxfee(self) -> Optional[int]:
+        return self._return_value_if_valid(self._max_fees, FASTEST)
+
+    """Recommends a maxPriorityFeePerGas value, which is awarded to the miner"""
+    def safe_low_tip(self) -> Optional[int]:
+        return self._return_value_if_valid(self._max_tips, SAFELOW)
+
+    def standard_tip(self) -> Optional[int]:
+        return self._return_value_if_valid(self._max_tips, STANDARD)
+
+    def fast_tip(self) -> Optional[int]:
+        return self._return_value_if_valid(self._max_tips, FAST)
+
+    def fastest_tip(self) -> Optional[int]:
+        return self._return_value_if_valid(self._max_tips, FASTEST)
 
 
 class EtherchainOrg(GasClientApi):
@@ -251,8 +283,18 @@ class Blocknative(GasClientApi):
         super().__init__(self.URL, refresh_interval, expiry, headers)
 
     def _parse_api_data(self, data):
+        from pprint import pprint
+        # pprint(data)
         next_block_prices = data['blockPrices'][0]['estimatedPrices']
-        self._gas_prices = [int(next_block_prices[3]['price'])*self.SCALE,
-                            int(next_block_prices[2]['price'])*self.SCALE,
-                            int(next_block_prices[1]['price'])*self.SCALE,
-                            int(next_block_prices[0]['price'])*self.SCALE]
+        self._gas_prices = [int(next_block_prices[3]['price']) * self.SCALE,
+                            int(next_block_prices[2]['price']) * self.SCALE,
+                            int(next_block_prices[1]['price']) * self.SCALE,
+                            int(next_block_prices[0]['price']) * self.SCALE]
+        self._max_fees = [int(next_block_prices[3]['maxFeePerGas']) * self.SCALE,
+                          int(next_block_prices[2]['maxFeePerGas']) * self.SCALE,
+                          int(next_block_prices[1]['maxFeePerGas']) * self.SCALE,
+                          int(next_block_prices[0]['maxFeePerGas']) * self.SCALE]
+        self._max_tips = [int(next_block_prices[3]['maxPriorityFeePerGas']) * self.SCALE,
+                          int(next_block_prices[2]['maxPriorityFeePerGas']) * self.SCALE,
+                          int(next_block_prices[1]['maxPriorityFeePerGas']) * self.SCALE,
+                          int(next_block_prices[0]['maxPriorityFeePerGas']) * self.SCALE]

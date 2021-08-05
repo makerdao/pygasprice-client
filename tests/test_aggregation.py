@@ -42,30 +42,30 @@ def test_aggregation_methodology():
 
     # A normal use case with an outlier
     prices = [24.00 * GWEI, 15.00 * GWEI, 24.00 * GWEI, 127.00 * GWEI, 13.00 * GWEI]
-    price = Aggregator.aggregate_price(prices)
+    price = Aggregator.aggregate(prices)
     assert price == 21.0 * GWEI
 
     # One price missing
     prices = [64.0 * GWEI, 64.0 * GWEI, 72.0 * GWEI, 65.0 * GWEI]
-    price = Aggregator.aggregate_price(prices)
+    price = Aggregator.aggregate(prices)
     assert price == 64.5 * GWEI
 
     # Only three prices
     prices = [16.80 * GWEI, 18.00 * GWEI, 15.65 * GWEI]
-    price = Aggregator.aggregate_price(prices)
+    price = Aggregator.aggregate(prices)
     assert price == 17.4 * GWEI
 
     # Only two prices
     prices = [23.0 * GWEI, 24.0 * GWEI]
-    price = Aggregator.aggregate_price(prices)
+    price = Aggregator.aggregate(prices)
     assert price == 23.5 * GWEI
 
     # One price
     prices = [33.3 * GWEI]
-    price = Aggregator.aggregate_price(prices)
+    price = Aggregator.aggregate(prices)
     assert price == 33.3 * GWEI
 
     # No prices should return None, not throw
     prices = []
-    price = Aggregator.aggregate_price(prices)
+    price = Aggregator.aggregate(prices)
     assert not price
