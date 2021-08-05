@@ -34,11 +34,6 @@ class Aggregator(GasClientApi):
         if blocknative_api_key:
             self.clients.append(Blocknative(refresh_interval=refresh_interval, expiry=expiry, api_key=blocknative_api_key))
 
-        self._safe_low_price = None
-        self._standard_price = None
-        self._fast_price = None
-        self._fastest_price = None
-
         super().__init__("aggregator", refresh_interval, expiry)
 
     def _background_run(self):
@@ -58,12 +53,12 @@ class Aggregator(GasClientApi):
         fast_prices = list(filter(lambda p: p, map(lambda c: c.fast_price(), self.clients)))
         fastest_prices = list(filter(lambda p: p, map(lambda c: c.fastest_price(), self.clients)))
 
-        self._safe_low_price = self.aggregate_price(safe_low_prices)
-        self._standard_price = self.aggregate_price(standard_prices)
-        self._fast_price = self.aggregate_price(fast_prices)
-        self._fastest_price = self.aggregate_price(fastest_prices)
+        self._gas_prices = [self.aggregate_price(safe_low_prices),
+                            self.aggregate_price(standard_prices),
+                            self.aggregate_price(fast_prices),
+                            self.aggregate_price(fastest_prices)]
 
-        self.logger.debug(f"Aggregated {fast_prices} to {self._fast_price}")
+        self.logger.debug(f"Aggregated {fast_prices} to {self._gas_prices[2]}")
 
         self._last_refresh = int(time.time())
 

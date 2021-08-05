@@ -84,9 +84,12 @@ class GasClientApi:
         except:
             self.logger.warning(f"Failed to fetch current gas prices from {self.URL}")
 
-    def _return_value_if_valid(self, value: int) -> Optional[int]:
-        if int(time.time()) - self._last_refresh <= self.expiry:
-            return value
+    def _return_value_if_valid(self, array: list, index: int) -> Optional[int]:
+        assert isinstance(array, list)
+        assert isinstance(index, int)
+
+        if int(time.time()) - self._last_refresh <= self.expiry and len(array) > index:
+            return array[index]
 
         else:
             if self._last_refresh == 0:
@@ -109,7 +112,7 @@ class GasClientApi:
             The current 'SafeLow (<30m)' gas price (in Wei), or `None` if the client price
             feed has expired.
         """
-        return self._return_value_if_valid(self._gas_prices[0])
+        return self._return_value_if_valid(self._gas_prices, 0)
 
     def standard_price(self) -> Optional[int]:
         """Returns the current 'Standard (<5m)' gas price (in Wei).
@@ -118,7 +121,7 @@ class GasClientApi:
             The current 'Standard (<5m)' gas price (in Wei), or `None` if the client price
             feed has expired.
         """
-        return self._return_value_if_valid(self._gas_prices[1])
+        return self._return_value_if_valid(self._gas_prices, 1)
 
     def fast_price(self) -> Optional[int]:
         """Returns the current 'Fast (<2m)' gas price (in Wei).
@@ -127,7 +130,7 @@ class GasClientApi:
             The current 'Fast (<2m)' gas price (in Wei), or `None` if the client price
             feed has expired.
         """
-        return self._return_value_if_valid(self._gas_prices[2])
+        return self._return_value_if_valid(self._gas_prices, 2)
 
     def fastest_price(self) -> Optional[int]:
         """Returns the current fastest (undocumented!) gas price (in Wei).
@@ -136,7 +139,7 @@ class GasClientApi:
             The current fastest (undocumented!) gas price (in Wei), or `None` if the client price
             feed has expired.
         """
-        return self._return_value_if_valid(self._gas_prices[3])
+        return self._return_value_if_valid(self._gas_prices, 3)
 
 
 class EtherchainOrg(GasClientApi):
