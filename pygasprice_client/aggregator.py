@@ -70,14 +70,15 @@ class Aggregator(GasClientApi):
     def aggregate(values: list):
         assert isinstance(values, list)
 
+        # If there are enough values, prune outliers (similar to Maker OSM behavior).
         if len(values) > 3:
             values.remove(max(values))
         if len(values) > 2:
             values.remove(min(values))
 
-        if len(values) > 1:
+        if len(values) > 1:     # Calculate an average if there are multiple values
             return sum(values) / len(values)
-        elif len(values) > 0:
+        elif len(values) > 0:   # If there is only one value, return it
             return values[0]
-        else:
+        else:                   # If there are no values, return null
             return None
