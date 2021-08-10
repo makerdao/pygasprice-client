@@ -17,7 +17,8 @@
 
 import time
 
-from pygasprice_client import GasClientApi, EthGasStation, POANetwork, EtherchainOrg, Etherscan, Gasnow, Blocknative
+from pygasprice_client import FAST, GasClientApi, EthGasStation, POANetwork, EtherchainOrg, \
+    Etherscan, Gasnow, Blocknative
 
 
 class Aggregator(GasClientApi):
@@ -34,11 +35,6 @@ class Aggregator(GasClientApi):
         if blocknative_api_key:
             self.clients.append(Blocknative(refresh_interval=refresh_interval, expiry=expiry, api_key=blocknative_api_key))
 
-        self._safe_low_price = None
-        self._standard_price = None
-        self._fast_price = None
-        self._fastest_price = None
-
         super().__init__("aggregator", refresh_interval, expiry)
 
     def _background_run(self):
@@ -53,32 +49,36 @@ class Aggregator(GasClientApi):
 
     def _fetch_price(self):
         # map() checks the client's price, filter() cleanses "None" prices from the list
-        safe_low_prices = list(filter(lambda p: p, map(lambda c: c.safe_low_price(), self.clients)))
-        standard_prices = list(filter(lambda p: p, map(lambda c: c.standard_price(), self.clients)))
-        fast_prices = list(filter(lambda p: p, map(lambda c: c.fast_price(), self.clients)))
-        fastest_prices = list(filter(lambda p: p, map(lambda c: c.fastest_price(), self.clients)))
+        self._gas_prices = [self.aggregate(list(filter(lambda p: p, map(lambda c: c.safe_low_price(), self.clients)))),
+                            self.aggregate(list(filter(lambda p: p, map(lambda c: c.standard_price(), self.clients)))),
+                            self.aggregate(list(filter(lambda p: p, map(lambda c: c.fast_price(), self.clients)))),
+                            self.aggregate(list(filter(lambda p: p, map(lambda c: c.fastest_price(), self.clients))))]
 
-        self._safe_low_price = self.aggregate_price(safe_low_prices)
-        self._standard_price = self.aggregate_price(standard_prices)
-        self._fast_price = self.aggregate_price(fast_prices)
-        self._fastest_price = self.aggregate_price(fastest_prices)
+        self._max_fees = [self.aggregate(list(filter(lambda p: p, map(lambda c: c.safe_low_maxfee(), self.clients)))),
+                          self.aggregate(list(filter(lambda p: p, map(lambda c: c.standard_maxfee(), self.clients)))),
+                          self.aggregate(list(filter(lambda p: p, map(lambda c: c.fast_maxfee(), self.clients)))),
+                          self.aggregate(list(filter(lambda p: p, map(lambda c: c.fastest_maxfee(), self.clients))))]
 
-        self.logger.debug(f"Aggregated {fast_prices} to {self._fast_price}")
+        self._max_tips = [self.aggregate(list(filter(lambda p: p, map(lambda c: c.safe_low_tip(), self.clients)))),
+                          self.aggregate(list(filter(lambda p: p, map(lambda c: c.standard_tip(), self.clients)))),
+                          self.aggregate(list(filter(lambda p: p, map(lambda c: c.fast_tip(), self.clients)))),
+                          self.aggregate(list(filter(lambda p: p, map(lambda c: c.fastest_tip(), self.clients))))]
 
         self._last_refresh = int(time.time())
 
     @staticmethod
-    def aggregate_price(prices: list):
-        assert isinstance(prices, list)
+    def aggregate(values: list):
+        assert isinstance(values, list)
 
-        if len(prices) > 3:
-            prices.remove(max(prices))
-        if len(prices) > 2:
-            prices.remove(min(prices))
+        # If there are enough values, prune outliers (similar to Maker OSM behavior).
+        if len(values) > 3:
+            values.remove(max(values))
+        if len(values) > 2:
+            values.remove(min(values))
 
-        if len(prices) > 1:
-            return sum(prices) / len(prices)
-        elif len(prices) > 0:
-            return prices[0]
-        else:
+        if len(values) > 1:     # Calculate an average if there are multiple values
+            return sum(values) / len(values)
+        elif len(values) > 0:   # If there is only one value, return it
+            return values[0]
+        else:                   # If there are no values, return null
             return None
