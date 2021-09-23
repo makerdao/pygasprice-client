@@ -1,5 +1,5 @@
 # pygasprice-client
-[![Build Status](https://travis-ci.com/makerdao/pygasprice-client.svg?branch=master)](https://travis-ci.com/makerdao/pygasprice-client)
+[![Build Status](https://github.com/makerdao/pygasprice-client/actions/workflows/.github/workflows/tests.yaml/badge.svg?branch=master)
 
 Tiny asynchronous client of several gas price APIs. 
 
