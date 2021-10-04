@@ -252,26 +252,6 @@ class Etherscan(GasClientApi):
                             int(data['result']['FastGasPrice'])*self.SCALE]
 
 
-class Gasnow(GasClientApi):
-
-    URL = "https://www.gasnow.org/api/v3/gas/price"
-
-    def __init__(self, refresh_interval: int, expiry: int, app_name=None):
-
-        assert(isinstance(app_name, str) or app_name is None)
-
-        if app_name is not None:
-            self.URL = f"{self.URL}?utm_source={app_name}"
-
-        super().__init__(self.URL, refresh_interval, expiry)
-
-    def _parse_api_data(self, data):
-        self._gas_prices = [int(data['data']['slow']),
-                            int(data['data']['standard']),
-                            int(data['data']['fast']),
-                            int(data['data']['rapid'])]
-
-
 class Blocknative(GasClientApi):
 
     URL = "https://api.blocknative.com/gasprices/blockprices"

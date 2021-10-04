@@ -20,7 +20,7 @@ import time
 
 import pytest
 
-from pygasprice_client import EthGasStation, POANetwork, EtherchainOrg, Etherscan, Gasnow
+from pygasprice_client import EthGasStation, POANetwork, EtherchainOrg, Etherscan
 
 
 GWEI = 1000000000
@@ -157,39 +157,3 @@ def test_etherscan_url():
 
     etherscan = Etherscan(10, 600, "abcdefg")
     assert etherscan.URL == "https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=abcdefg"
-
-
-@pytest.mark.timeout(45)
-def test_gasnow_integration():
-    logging.basicConfig(format='%(asctime)-15s %(levelname)-8s %(message)s', level=logging.DEBUG)
-    logging.getLogger('urllib3.connectionpool').setLevel(logging.INFO)
-    logging.getLogger('requests.packages.urllib3.connectionpool').setLevel(logging.INFO)
-
-    gasnow = Gasnow(10, 600, "MyTestApp456")
-
-    while True:
-        safe_low_price = gasnow.safe_low_price()
-        logging.info(safe_low_price)
-
-        standard_price = gasnow.standard_price()
-        logging.info(standard_price)
-
-        fast_price = gasnow.fast_price()
-        logging.info(fast_price)
-
-        fastest_price = gasnow.fastest_price()
-        logging.info(fast_price)
-
-        if safe_low_price is not None and standard_price is not None and fast_price is not None and fastest_price is not None:
-            validate_prices(safe_low_price, standard_price, fast_price, fastest_price)
-            break
-
-        time.sleep(10)
-
-
-def test_gasnow_url():
-    gasnow = Gasnow(10, 600)
-    assert gasnow.URL == "https://www.gasnow.org/api/v3/gas/price"
-
-    gasnow = Gasnow(10, 600, "abcdefg")
-    assert gasnow.URL == "https://www.gasnow.org/api/v3/gas/price?utm_source=abcdefg"
