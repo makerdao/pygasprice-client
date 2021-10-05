@@ -18,19 +18,18 @@
 import time
 
 from pygasprice_client import FAST, GasClientApi, EthGasStation, POANetwork, EtherchainOrg, \
-    Etherscan, Gasnow, Blocknative
+    Etherscan, Blocknative
 
 
 class Aggregator(GasClientApi):
 
     def __init__(self, refresh_interval: int, expiry: int, ethgasstation_api_key=None, poa_network_alt_url=None,
-                 etherscan_api_key=None, gasnow_app_name="pygasprice-client", blocknative_api_key=None):
+                 etherscan_api_key=None, blocknative_api_key=None):
         self.clients = [
             EthGasStation(refresh_interval=refresh_interval, expiry=expiry, api_key=ethgasstation_api_key),
             EtherchainOrg(refresh_interval=refresh_interval, expiry=expiry),
             POANetwork(refresh_interval=refresh_interval, expiry=expiry, alt_url=poa_network_alt_url),
-            Etherscan(refresh_interval=refresh_interval, expiry=expiry, api_key=etherscan_api_key),
-            Gasnow(refresh_interval=refresh_interval, expiry=expiry, app_name=gasnow_app_name)
+            Etherscan(refresh_interval=refresh_interval, expiry=expiry, api_key=etherscan_api_key)
         ]
         if blocknative_api_key:
             self.clients.append(Blocknative(refresh_interval=refresh_interval, expiry=expiry, api_key=blocknative_api_key))
