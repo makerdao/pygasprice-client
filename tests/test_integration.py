@@ -126,13 +126,13 @@ def test_ethgasstation_url():
     assert egs.URL == "https://ethgasstation.info/json/ethgasAPI.json?api-key=abcdefg"
 
 
-@pytest.mark.timeout(45)
+@pytest.mark.timeout(60)
 def test_etherscan_integration():
     logging.basicConfig(format='%(asctime)-15s %(levelname)-8s %(message)s', level=logging.DEBUG)
     logging.getLogger('urllib3.connectionpool').setLevel(logging.INFO)
     logging.getLogger('requests.packages.urllib3.connectionpool').setLevel(logging.INFO)
 
-    etherscan = Etherscan(10, 600)
+    etherscan = Etherscan(30, 600)
 
     while True:
         safe_low_price = etherscan.safe_low_price()
@@ -148,14 +148,14 @@ def test_etherscan_integration():
             validate_prices(safe_low_price, standard_price, fast_price, None)
             break
 
-        time.sleep(10)
+        time.sleep(20)
 
 
 def test_etherscan_url():
-    etherscan = Etherscan(10, 600)
+    etherscan = Etherscan(30, 600)
     assert etherscan.URL == "https://api.etherscan.io/api?module=gastracker&action=gasoracle"
 
-    etherscan = Etherscan(10, 600, "abcdefg")
+    etherscan = Etherscan(30, 600, "abcdefg")
     assert etherscan.URL == "https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=abcdefg"
 
 
