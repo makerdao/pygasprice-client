@@ -68,6 +68,15 @@ class GasClientApi:
         self._last_refresh = 0
         self._expired = True
         threading.Thread(target=self._background_run, daemon=True).start()
+        
+        # logger_url - to avoid potential api-key values being present in logs.
+        pattern          = '?api-key'
+        self.logger_url  = ''
+
+        if pattern in self.URL:
+            self.logger_url = self.URL.split(pattern, 1)[0]
+        else:
+            self.logger_url = self.URL
 
     def _background_run(self):
         while True:
@@ -81,10 +90,10 @@ class GasClientApi:
             self._parse_api_data(data)
             self._last_refresh = int(time.time())
 
-            self.logger.debug(f"Fetched current gas prices from {self.URL}: {data}")
+            self.logger.debug(f"Fetched current gas prices from {self.logger_url}: {data}")
 
             if self._expired:
-                self.logger.info(f"Current gas prices from {self.URL} became available")
+                self.logger.info(f"Current gas prices from {self.logger_url} became available")
                 self._expired = False
         except:
             self.logger.warning(f"Failed to fetch current gas prices from {self.URL}")
@@ -98,11 +107,11 @@ class GasClientApi:
 
         else:
             if self._last_refresh == 0:
-                self.logger.warning(f"Current gas prices from {self.URL} are unavailable")
+                self.logger.warning(f"Current gas prices from {self.logger_url} are unavailable")
                 self._last_refresh = 1
 
             if not self._expired:
-                self.logger.warning(f"Current gas prices from {self.URL} have expired")
+                self.logger.warning(f"Current gas prices from {self.logger_url} have expired")
                 self._expired = True
 
             return None
