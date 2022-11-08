@@ -69,7 +69,7 @@ class GasClientApi:
         self._expired = True
         threading.Thread(target=self._background_run, daemon=True).start()
         
-        # logger_url - to remove potential api-key values being present in logs.
+        # logger_url - to avoid potential api-key values being present in logs.
         pattern          = '?api-key'
         self.logger_url  = ''
 
