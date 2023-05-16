@@ -255,10 +255,10 @@ class Etherscan(GasClientApi):
         super().__init__(self.URL, refresh_interval, expiry)
 
     def _parse_api_data(self, data):
-        self._gas_prices = [int(data['result']['SafeGasPrice'])*self.SCALE,
-                            int(data['result']['ProposeGasPrice'])*self.SCALE,
-                            int(data['result']['FastGasPrice'])*self.SCALE,
-                            int(data['result']['FastGasPrice'])*self.SCALE]
+        self._gas_prices = [int(data['result']['SafeGasPrice']*self.SCALE),
+                            int(data['result']['ProposeGasPrice']*self.SCALE),
+                            int(data['result']['FastGasPrice']*self.SCALE),
+                            int(data['result']['FastGasPrice']*self.SCALE)]
 
 
 class Blocknative(GasClientApi):
@@ -273,15 +273,15 @@ class Blocknative(GasClientApi):
 
     def _parse_api_data(self, data):
         next_block_prices = data['blockPrices'][0]['estimatedPrices']
-        self._gas_prices = [int(next_block_prices[3]['price']) * self.SCALE,
-                            int(next_block_prices[2]['price']) * self.SCALE,
-                            int(next_block_prices[1]['price']) * self.SCALE,
-                            int(next_block_prices[0]['price']) * self.SCALE]
-        self._max_fees = [int(next_block_prices[3]['maxFeePerGas']) * self.SCALE,
-                          int(next_block_prices[2]['maxFeePerGas']) * self.SCALE,
-                          int(next_block_prices[1]['maxFeePerGas']) * self.SCALE,
-                          int(next_block_prices[0]['maxFeePerGas']) * self.SCALE]
-        self._max_tips = [int(next_block_prices[3]['maxPriorityFeePerGas']) * self.SCALE,
-                          int(next_block_prices[2]['maxPriorityFeePerGas']) * self.SCALE,
-                          int(next_block_prices[1]['maxPriorityFeePerGas']) * self.SCALE,
-                          int(next_block_prices[0]['maxPriorityFeePerGas']) * self.SCALE]
+        self._gas_prices = [int(next_block_prices[3]['price']*self.SCALE),
+                            int(next_block_prices[2]['price']*self.SCALE),
+                            int(next_block_prices[1]['price']*self.SCALE),
+                            int(next_block_prices[0]['price']*self.SCALE)]
+        self._max_fees = [int(next_block_prices[3]['maxFeePerGas']*self.SCALE),
+                          int(next_block_prices[2]['maxFeePerGas']*self.SCALE),
+                          int(next_block_prices[1]['maxFeePerGas']*self.SCALE),
+                          int(next_block_prices[0]['maxFeePerGas']*self.SCALE)]
+        self._max_tips = [int(next_block_prices[3]['maxPriorityFeePerGas']*self.SCALE),
+                          int(next_block_prices[2]['maxPriorityFeePerGas']*self.SCALE),
+                          int(next_block_prices[1]['maxPriorityFeePerGas']*self.SCALE),
+                          int(next_block_prices[0]['maxPriorityFeePerGas']*self.SCALE)]
